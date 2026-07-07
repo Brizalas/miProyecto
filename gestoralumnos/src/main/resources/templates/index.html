@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ca">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title data-th-text="${titolPagina}">Gestor d'alumnes</title>
+    </head>
+    <body>
+
+        <h1 data-th-text="${titolPagina}">Gestor d'alumnes</h1>
+
+        <p data-th-text="${missatge}">Benvinguda</p>
+
+        <hr>
+
+        <p>
+            Total d'alumnes registrats:
+            <strong data-th-text="${totalAlumnes}">0</strong>
+        </p>
+        <p>
+            Alumnes:   
+
+        </p>
+        <ul>
+            <li data-th-each="alumne: ${alumnes}">
+                <span data-th-text="${alumne.nombre}">Nom alumne</span>
+
+            </li>
+        </ul>
+        
+        <p>Prova de cache 1234</p>
+        <p>Segona prova</p>
+
+
+
+
+
+
+        
+
+    </body>
+</html>

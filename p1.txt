@@ -1,0 +1,19 @@
+App de escritorio en java para controlar el contenido de los alumnos de guitarra.
+
+Tiene que almacenar los nombres y apellidos de los alumnos. 
+Tiene que haber una casilla para marcar si tiene necesidades especiales educativas. 
+Los comentarios del profesor.
+Las tareas de la clase en curso.
+El temario organizado de las clases. 
+
+Todos los datos tienen que ser introducidos por el profesor.
+
+La base de volumen de alumnos es de 50 a 60 máximo.
+
+Tiene que tener interfaz gráfica. (Java swing o usamos algo más moderno para poder habituarnos)
+
+Tiene que ser modular con capacidad de escalar. 
+
+Tiene que poderse trabajar desde GitHub o tener capacidad para dejar el código fuente en un repositorio en GitHub
+
+Vigila los principios SOLID
