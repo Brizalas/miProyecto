@@ -17,6 +17,21 @@
             Total d'alumnes registrats:
             <strong data-th-text="${totalAlumnes}">0</strong>
         </p>
+        
+        <h2>Afegir alumne</h2>
+        
+        <form action="/afegir-alumne" method="post">
+            <label for="nombre">Nom: </label>
+            <input type="text" id="nombre" name="nombre">
+            
+            <button type="submit">Afegir</button>
+             
+        </form>
+        
+        <hr>
+        
+        
+        
         <p>
             Alumnes:   
 

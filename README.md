@@ -978,3 +978,515 @@ Ya no estamos abriendo un HTML estático directamente.
 Ahora la página es servida por una aplicación Java con Spring Boot.
 
 Esto convierte el proyecto en una aplicación web real.
+
+### 9/7/2026
+
+Añadir alumnos desde un formulario con Spring Boot y Thymeleaf
+
+En esta parte del proyecto hemos dado un paso importante: la aplicación ya no solo muestra datos enviados desde el Controller hacia el HTML, sino que ahora también permite enviar datos desde el HTML hacia el Controller.
+
+Hasta ahora, el flujo era este:
+
+Controller → Model → Thymeleaf → HTML
+
+Es decir, Java preparaba los datos, los metía en el Model y Thymeleaf los mostraba en la página.
+
+Ahora hemos añadido el flujo contrario:
+
+HTML → Formulario → Controller
+
+Esto nos permite escribir datos en el navegador, enviarlos a Spring Boot y añadirlos a nuestra lista de alumnos.
+
+⸻
+
+Objetivo de esta parte
+
+El objetivo ha sido crear un formulario en index.html para añadir un nuevo alumno.
+
+De momento, para simplificar, el formulario solo pide el nombre del alumno.
+
+Cuando el usuario escribe un nombre y pulsa el botón, ocurre lo siguiente:
+
+1. El formulario HTML envía el dato al Controller.
+2. Spring Boot recibe el dato con un método POST.
+3. El Controller crea un nuevo objeto Alumno.
+4. El nuevo Alumno se añade a la lista.
+5. La aplicación redirige de nuevo a la página principal.
+6. Thymeleaf vuelve a mostrar la lista actualizada.
+
+⸻
+
+Diferencia entre GET y POST
+
+En esta parte hemos utilizado dos tipos de peticiones HTTP:
+
+@GetMapping("/")
+
+y
+
+@PostMapping("/afegir-alumne")
+
+Cada una tiene una función distinta.
+
+⸻
+
+@GetMapping
+
+@GetMapping se utiliza para mostrar una página.
+
+En nuestro caso:
+
+@GetMapping("/")
+public String mostrarInicio(Model model) {
+    model.addAttribute("titolPagina", "Gestor d'alumnes");
+    model.addAttribute("missatge", "Benvinguda a la meva aplicació de gestió d'alumnes");
+    model.addAttribute("totalAlumnes", alumnos.size());
+    model.addAttribute("alumnes", alumnos);
+    return "index";
+}
+
+Este método responde cuando el usuario entra en la ruta principal:
+
+http://localhost:8080/
+
+Su función es preparar los datos que necesita la vista HTML.
+
+Los datos se envían mediante el objeto Model:
+
+model.addAttribute("titolPagina", "Gestor d'alumnes");
+model.addAttribute("missatge", "Benvinguda a la meva aplicació de gestió d'alumnes");
+model.addAttribute("totalAlumnes", alumnos.size());
+model.addAttribute("alumnes", alumnos);
+
+Después, el método devuelve:
+
+return "index";
+
+Esto indica a Spring Boot que debe cargar la plantilla:
+
+src/main/resources/templates/index.html
+
+⸻
+
+@PostMapping
+
+@PostMapping se utiliza para recibir datos enviados desde un formulario.
+
+En nuestro caso:
+
+@PostMapping("/afegir-alumne")
+public String afegirAlumne(@RequestParam String nombre) {
+    Long nouId = (long) alumnos.size() + 1;
+    Alumno nouAlumne = new Alumno(
+            nouId,
+            nombre,
+            "",
+            "",
+            null,
+            "",
+            ""
+    );
+    alumnos.add(nouAlumne);
+    return "redirect:/";
+}
+
+Este método se ejecuta cuando el formulario HTML envía datos a la ruta:
+
+/afegir-alumne
+
+El formulario envía el nombre del alumno y el Controller lo recibe con:
+
+@RequestParam String nombre
+
+⸻
+
+@RequestParam
+
+@RequestParam sirve para recoger datos que llegan desde un formulario HTML.
+
+En el HTML tenemos este input:
+
+<input type="text" id="nombre" name="nombre">
+
+La parte importante para Spring Boot es:
+
+name="nombre"
+
+Ese nombre debe coincidir con el parámetro del Controller:
+
+@RequestParam String nombre
+
+La conexión queda así:
+
+HTML:
+<input name="nombre">
+Java:
+@RequestParam String nombre
+
+Cuando el usuario escribe un nombre en el formulario, Spring Boot recoge ese valor y lo guarda dentro de la variable nombre.
+
+⸻
+
+Formulario HTML
+
+En index.html hemos añadido un formulario:
+
+<form action="/afegir-alumne" method="post">
+    <label for="nombre">Nom:</label>
+    <input type="text" id="nombre" name="nombre">
+    <button type="submit">Afegir</button>
+</form>
+
+Este formulario tiene dos partes importantes:
+
+action="/afegir-alumne"
+
+Indica a qué ruta se enviarán los datos.
+
+method="post"
+
+Indica que los datos se enviarán mediante una petición POST.
+
+Por tanto, cuando el usuario pulsa el botón, el formulario busca en el Controller un método preparado para recibir una petición POST en /afegir-alumne.
+
+Ese método es:
+
+@PostMapping("/afegir-alumne")
+public String afegirAlumne(@RequestParam String nombre) {
+    ...
+}
+
+⸻
+
+Por qué hemos sacado la lista fuera del método
+
+Antes teníamos la lista de alumnos dentro del método mostrarInicio():
+
+@GetMapping("/")
+public String mostrarInicio(Model model) {
+    List<Alumno> alumnos = new ArrayList<>();
+    alumnos.add(new Alumno(1L, "Laia", "Martinez", "12", null, "Guitarra", "Cristian"));
+    alumnos.add(new Alumno(2L, "Miquel", "Perez", "17", null, "Dansa", "Olga"));
+    alumnos.add(new Alumno(3L, "Oscar", "Gomez", "42", null, "Teatre", "Lara"));
+    ...
+}
+
+El problema es que, de esta manera, la lista se crea de nuevo cada vez que se carga la página.
+
+Es decir:
+
+Recargar página
+↓
+Crear lista nueva
+↓
+Añadir Laia, Miquel y Oscar
+↓
+Mostrar HTML
+
+Esto no nos sirve para añadir nuevos alumnos desde un formulario, porque cada recarga borraría los alumnos añadidos y volvería a crear la lista inicial.
+
+Por eso hemos movido la lista fuera del método:
+
+private List<Alumno> alumnos = new ArrayList<>();
+
+Ahora la lista pertenece al HomeController.
+
+⸻
+
+Constructor del Controller
+
+También hemos añadido un constructor:
+
+public HomeController() {
+    alumnos.add(new Alumno(1L, "Laia", "Martinez", "12", null, "Guitarra", "Cristian"));
+    alumnos.add(new Alumno(2L, "Miquel", "Perez", "17", null, "Dansa", "Olga"));
+    alumnos.add(new Alumno(3L, "Oscar", "Gomez", "42", null, "Teatre", "Lara"));
+}
+
+El constructor se ejecuta cuando Spring Boot crea el objeto HomeController.
+
+Gracias a esto, los alumnos iniciales se cargan una sola vez.
+
+La lista ya no se reinicia cada vez que se recarga la página.
+
+⸻
+
+Código completo del Controller
+
+package com.cristian.gestoralumnos.controller;
+import com.cristian.gestoralumnos.model.Alumno;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+@Controller
+public class HomeController {
+    private List<Alumno> alumnos = new ArrayList<>();
+    public HomeController() {
+        alumnos.add(new Alumno(1L, "Laia", "Martinez", "12", null, "Guitarra", "Cristian"));
+        alumnos.add(new Alumno(2L, "Miquel", "Perez", "17", null, "Dansa", "Olga"));
+        alumnos.add(new Alumno(3L, "Oscar", "Gomez", "42", null, "Teatre", "Lara"));
+    }
+    @GetMapping("/")
+    public String mostrarInicio(Model model) {
+        model.addAttribute("titolPagina", "Gestor d'alumnes");
+        model.addAttribute("missatge", "Benvinguda a la meva aplicació de gestió d'alumnes");
+        model.addAttribute("totalAlumnes", alumnos.size());
+        model.addAttribute("alumnes", alumnos);
+        return "index";
+    }
+    @PostMapping("/afegir-alumne")
+    public String afegirAlumne(@RequestParam String nombre) {
+        Long nouId = (long) alumnos.size() + 1;
+        Alumno nouAlumne = new Alumno(
+                nouId,
+                nombre,
+                "",
+                "",
+                null,
+                "",
+                ""
+        );
+        alumnos.add(nouAlumne);
+        return "redirect:/";
+    }
+}
+
+⸻
+
+Código completo del HTML
+
+<!DOCTYPE html>
+<html lang="ca">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title data-th-text="${titolPagina}">Gestor d'alumnes</title>
+    </head>
+    <body>
+        <h1 data-th-text="${titolPagina}">Gestor d'alumnes</h1>
+        <p data-th-text="${missatge}">Benvinguda</p>
+        <hr>
+        <p>
+            Total d'alumnes registrats:
+            <strong data-th-text="${totalAlumnes}">0</strong>
+        </p>
+        <h2>Afegir alumne</h2>
+        <form action="/afegir-alumne" method="post">
+            <label for="nombre">Nom:</label>
+            <input type="text" id="nombre" name="nombre">
+            <button type="submit">Afegir</button>
+        </form>
+        <hr>
+        <p>
+            Alumnes:
+        </p>
+        <ul>
+            <li data-th-each="alumne: ${alumnes}">
+                <span data-th-text="${alumne.nombre}">Nom alumne</span>
+            </li>
+        </ul>
+    </body>
+</html>
+
+⸻
+
+Explicación del redirect
+
+Al final del método afegirAlumne() usamos:
+
+return "redirect:/";
+
+Esto significa que, después de añadir el nuevo alumno, Spring Boot redirige de nuevo a la ruta principal:
+
+/
+
+Entonces se vuelve a ejecutar el método:
+
+@GetMapping("/")
+public String mostrarInicio(Model model)
+
+Este método vuelve a preparar los datos y Thymeleaf vuelve a pintar la página.
+
+El flujo completo es:
+
+Formulario HTML
+↓
+POST /afegir-alumne
+↓
+Controller recibe el nombre
+↓
+Controller crea un nuevo Alumno
+↓
+Controller añade el Alumno a la lista
+↓
+redirect:/
+↓
+GET /
+↓
+Se vuelve a mostrar index.html con la lista actualizada
+
+Este patrón es muy habitual en aplicaciones web:
+
+POST → procesar datos → redirect → GET
+
+⸻
+
+Mostrar la lista con data-th-each
+
+Para mostrar todos los alumnos usamos:
+
+<ul>
+    <li data-th-each="alumne: ${alumnes}">
+        <span data-th-text="${alumne.nombre}">Nom alumne</span>
+    </li>
+</ul>
+
+data-th-each funciona como un bucle.
+
+En este caso:
+
+data-th-each="alumne: ${alumnes}"
+
+Significa:
+
+Por cada objeto dentro de la lista alumnes,
+crea una variable temporal llamada alumne.
+
+Después podemos acceder a sus propiedades:
+
+data-th-text="${alumne.nombre}"
+
+Esto muestra el nombre de cada alumno.
+
+⸻
+
+Sintaxis importante de Thymeleaf
+
+En Thymeleaf usamos ${} para acceder a datos que vienen desde el Model.
+
+Por ejemplo, en el Controller tenemos:
+
+model.addAttribute("titolPagina", "Gestor d'alumnes");
+
+Y en el HTML lo usamos así:
+
+<h1 data-th-text="${titolPagina}">Gestor d'alumnes</h1>
+
+Otro ejemplo:
+
+model.addAttribute("totalAlumnes", alumnos.size());
+
+Y en el HTML:
+
+<strong data-th-text="${totalAlumnes}">0</strong>
+
+La idea es:
+
+Controller:
+model.addAttribute("nombreDato", valor);
+HTML:
+${nombreDato}
+
+⸻
+
+Diferencia entre id y name en el input
+
+En el formulario tenemos:
+
+<input type="text" id="nombre" name="nombre">
+
+Aunque id y name tengan el mismo valor, no hacen exactamente lo mismo.
+
+id sirve para identificar el elemento dentro del HTML.
+
+También permite conectar el label con el input:
+
+<label for="nombre">Nom:</label>
+<input id="nombre">
+
+name sirve para enviar el dato al servidor.
+
+Spring Boot usa el valor de name para saber qué dato debe recoger con @RequestParam.
+
+Por eso esta parte es fundamental:
+
+name="nombre"
+
+Debe coincidir con:
+
+@RequestParam String nombre
+
+⸻
+
+Resumen de lo aprendido
+
+En esta parte hemos aprendido a:
+
+1. Crear una lista de objetos como atributo del Controller.
+2. Inicializar datos usando el constructor del Controller.
+3. Mostrar datos en una plantilla Thymeleaf usando Model.
+4. Recorrer una lista en HTML con data-th-each.
+5. Crear un formulario HTML.
+6. Enviar datos desde el formulario usando method="post".
+7. Recibir datos en el Controller con @PostMapping.
+8. Capturar valores del formulario con @RequestParam.
+9. Crear un nuevo objeto Alumno con los datos recibidos.
+10. Añadir el nuevo objeto a una lista.
+11. Redirigir a la página principal con redirect:/.
+
+⸻
+
+Estado actual de la aplicación
+
+La aplicación ya permite:
+
+- Mostrar una página principal.
+- Enviar datos desde el Controller al HTML.
+- Mostrar una lista de alumnos.
+- Contar el número total de alumnos.
+- Añadir un nuevo alumno desde un formulario.
+- Actualizar la lista después de enviar el formulario.
+
+Todavía no estamos usando base de datos.
+
+De momento, los datos se guardan en una lista en memoria:
+
+private List<Alumno> alumnos = new ArrayList<>();
+
+Esto significa que los alumnos añadidos se mantienen mientras la aplicación está encendida, pero se pierden cuando se reinicia el servidor.
+
+Más adelante sustituiremos esta lista manual por una base de datos usando:
+
+Entity
+Repository
+Service
+JPA
+H2
+
+⸻
+
+Próximo paso del proyecto
+
+El siguiente paso lógico será ampliar el formulario para añadir más datos del alumno:
+
+- Nombre
+- Apellido
+- Edad
+- Disciplina
+- Profesor
+
+Después podremos avanzar hacia las operaciones básicas de un CRUD:
+
+C → Create → Crear alumnos
+R → Read   → Mostrar alumnos
+U → Update → Editar alumnos
+D → Delete → Borrar alumnos
+
+Con lo hecho hasta ahora ya tenemos la base de la C y la R del CRUD:
+
+Create → Añadir alumno desde formulario
+Read   → Mostrar lista de alumnos en pantalla
