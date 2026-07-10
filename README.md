@@ -1490,3 +1490,606 @@ Con lo hecho hasta ahora ya tenemos la base de la C y la R del CRUD:
 
 Create → Añadir alumno desde formulario
 Read   → Mostrar lista de alumnos en pantalla
+
+
+10/7/2026
+
+Implementación de la función DELETE
+
+En esta fase del proyecto se ha añadido la funcionalidad necesaria para eliminar alumnos de la aplicación.
+
+La aplicación todavía no utiliza una base de datos. Los alumnos se guardan temporalmente dentro de una lista de Java:
+
+private List<Alumno> alumnos = new ArrayList<>();
+
+Por este motivo, cuando se reinicia la aplicación, todos los alumnos creados desaparecen.
+
+⸻
+
+Objetivo
+
+Queremos que cada alumno mostrado en la página tenga su propio botón de eliminar.
+
+Cuando el usuario pulse ese botón:
+
+1. El formulario enviará el ID del alumno.
+2. El Controller recibirá ese ID.
+3. Buscará al alumno correspondiente dentro de la lista.
+4. Eliminará al alumno.
+5. Redirigirá nuevamente a la página principal.
+6. La lista se mostrará actualizada.
+
+⸻
+
+El ID de los alumnos
+
+Cada alumno necesita tener un identificador único.
+
+El ID permite distinguir a un alumno de los demás, aunque existan dos alumnos con el mismo nombre o apellido.
+
+Por ejemplo:
+
+ID 1 - Laura Pérez
+ID 2 - Laura Pérez
+
+Aunque ambos alumnos tengan el mismo nombre, siguen siendo objetos diferentes porque tienen un ID distinto.
+
+El ID no tiene por qué mostrarse en la página, pero debe existir internamente para poder identificar correctamente al alumno.
+
+⸻
+
+Crear un contador de ID
+
+Dentro de HomeController se crea una variable para controlar el siguiente ID disponible:
+
+private long siguienteId = 1;
+
+El controlador queda inicialmente así:
+
+@Controller
+public class HomeController {
+    private List<Alumno> alumnos = new ArrayList<>();
+    private long siguienteId = 1;
+}
+
+La lista comienza vacía, por lo que el primer alumno creado recibirá el ID 1.
+
+⸻
+
+Asignar un ID al crear un alumno
+
+Dentro del método encargado de añadir alumnos se utiliza el contador:
+
+long nouId = siguienteId;
+siguienteId++;
+
+Primero se guarda el valor actual de siguienteId dentro de nouId.
+
+Después se incrementa siguienteId para preparar el ID del próximo alumno.
+
+Ejemplo:
+
+Primer alumno  → ID 1
+Segundo alumno → ID 2
+Tercer alumno  → ID 3
+Cuarto alumno  → ID 4
+
+El método completo queda así:
+
+@PostMapping("/afegir-alumne")
+public String afegirAlumne(
+        @RequestParam String nombre,
+        @RequestParam String apellido,
+        @RequestParam String edad,
+        @RequestParam String modalidad,
+        @RequestParam String profesor
+) {
+    long nouId = siguienteId;
+    siguienteId++;
+    Alumno nouAlumne = new Alumno(
+            nouId,
+            nombre,
+            apellido,
+            edad,
+            null,
+            modalidad,
+            profesor
+    );
+    alumnos.add(nouAlumne);
+    return "redirect:/";
+}
+
+También se podría escribir de forma abreviada:
+
+long nouId = siguienteId++;
+
+Sin embargo, utilizar dos líneas permite ver con más claridad que primero se asigna el ID y después se incrementa el contador.
+
+⸻
+
+Por qué no se utiliza alumnos.size() + 1
+
+Inicialmente se podría pensar en generar el ID utilizando el tamaño de la lista:
+
+long nouId = alumnos.size() + 1;
+
+Este sistema funciona mientras no se eliminen alumnos.
+
+Por ejemplo, tenemos:
+
+ID 1
+ID 2
+ID 3
+
+La lista contiene tres alumnos.
+
+Si eliminamos el alumno con ID 2, quedan:
+
+ID 1
+ID 3
+
+Ahora el tamaño de la lista es 2.
+
+Si creamos un nuevo alumno utilizando:
+
+alumnos.size() + 1
+
+el nuevo ID será:
+
+2 + 1 = 3
+
+El resultado sería:
+
+ID 1
+ID 3
+ID 3
+
+Tendríamos dos alumnos con el mismo ID.
+
+Por este motivo, el ID no debe depender del tamaño actual de la lista.
+
+Se utiliza un contador independiente:
+
+private long siguienteId = 1;
+
+⸻
+
+Los ID eliminados no se reutilizan
+
+Si tenemos estos alumnos:
+
+ID 1
+ID 2
+ID 3
+
+y eliminamos el alumno con ID 2, quedan:
+
+ID 1
+ID 3
+
+El contador interno ya está preparado para crear el ID 4.
+
+Por tanto, el siguiente alumno recibirá:
+
+ID 4
+
+La lista quedará así:
+
+ID 1
+ID 3
+ID 4
+
+No es necesario que los ID sean consecutivos.
+
+Lo importante es que sean únicos.
+
+Un ID eliminado no se vuelve a asignar mientras la aplicación siga ejecutándose.
+
+Actualmente, como los datos están guardados en memoria, el contador volverá a empezar desde 1 cuando se reinicie completamente la aplicación.
+
+Más adelante, cuando se utilice una base de datos, será la propia base de datos la que gestione normalmente los ID autoincrementales.
+
+⸻
+
+Crear la ruta para eliminar alumnos
+
+Dentro de HomeController se añade un nuevo método:
+
+@PostMapping("/eliminar-alumne")
+public String eliminarAlumne(@RequestParam long id) {
+    alumnos.removeIf(alumne -> alumne.getId() == id);
+    return "redirect:/";
+}
+
+La anotación:
+
+@PostMapping("/eliminar-alumne")
+
+indica que este método responderá a peticiones POST enviadas a la ruta:
+
+/eliminar-alumne
+
+⸻
+
+Recibir el ID con @RequestParam
+
+El método recibe el ID enviado desde el formulario:
+
+@RequestParam long id
+
+@RequestParam indica a Spring que debe buscar un parámetro llamado id dentro de la petición HTTP.
+
+Por ejemplo, el formulario puede enviar:
+
+id=3
+
+Spring recoge ese valor y lo guarda dentro de la variable:
+
+long id
+
+La conexión entre el HTML y el Controller se produce porque ambos utilizan el mismo nombre:
+
+name="id"
+@RequestParam long id
+
+⸻
+
+Eliminar el alumno de la lista
+
+La eliminación se realiza con:
+
+alumnos.removeIf(alumne -> alumne.getId() == id);
+
+removeIf pertenece a las colecciones de Java.
+
+Permite eliminar los elementos que cumplen una condición.
+
+La expresión:
+
+alumne -> alumne.getId() == id
+
+es una expresión lambda.
+
+Puede interpretarse de la siguiente manera:
+
+Para cada alumno de la lista,
+comprueba si su ID coincide con el ID recibido.
+Si coincide, elimina ese alumno.
+
+La comparación utilizada es:
+
+alumne.getId() == id
+
+* alumne.getId() obtiene el ID del alumno actual de la lista.
+* id contiene el ID recibido desde el formulario.
+* == comprueba si ambos valores son iguales.
+
+Si los ID coinciden, removeIf elimina ese alumno.
+
+⸻
+
+Redirigir después de eliminar
+
+Después de eliminar el alumno, el método devuelve:
+
+return "redirect:/";
+
+Esto indica a Spring que debe redirigir el navegador a la ruta principal:
+
+/
+
+La ruta principal vuelve a ejecutar:
+
+@GetMapping("/")
+public String mostrarInicio(Model model)
+
+Este método envía nuevamente al HTML la lista actualizada:
+
+model.addAttribute("alumnes", alumnos);
+
+También vuelve a calcular el número total de alumnos:
+
+model.addAttribute("totalAlumnes", alumnos.size());
+
+Por tanto, después de eliminar un alumno:
+
+* desaparece del listado;
+* el contador total se actualiza;
+* la página se vuelve a cargar.
+
+⸻
+
+Crear el botón de eliminar en el HTML
+
+Dentro del bucle de Thymeleaf se añade un formulario para cada alumno:
+
+<ul>
+    <li data-th-each="alumne : ${alumnes}">
+        <strong data-th-text="${alumne.nombre}">Nom</strong>
+        <span data-th-text="${alumne.apellido}">Cognom</span>
+        -
+        <span data-th-text="${alumne.edad}">Edat</span>
+        anys
+        -
+        <span data-th-text="${alumne.modalidad}">Modalitat</span>
+        -
+        Professor/a:
+        <span data-th-text="${alumne.profesor}">Professor</span>
+        <form action="/eliminar-alumne" method="post">
+            <input
+                type="hidden"
+                name="id"
+                data-th-value="${alumne.id}">
+            <button type="submit">Eliminar</button>
+        </form>
+    </li>
+</ul>
+
+Como el formulario está dentro de:
+
+<li data-th-each="alumne : ${alumnes}">
+
+Thymeleaf crea un formulario diferente para cada alumno.
+
+Cada formulario contiene el ID correspondiente a ese alumno.
+
+⸻
+
+El campo oculto hidden
+
+El formulario contiene este campo:
+
+<input
+    type="hidden"
+    name="id"
+    data-th-value="${alumne.id}">
+
+El atributo:
+
+type="hidden"
+
+indica que el campo no debe mostrarse visualmente en la página.
+
+Aunque el usuario no lo vea, el campo sigue formando parte del formulario y su valor se envía al Controller.
+
+El atributo:
+
+name="id"
+
+establece el nombre del parámetro que se enviará.
+
+El atributo de Thymeleaf:
+
+data-th-value="${alumne.id}"
+
+introduce dentro del campo el ID del alumno actual.
+
+Por ejemplo, para un alumno con ID 3, Thymeleaf generará internamente algo parecido a:
+
+<input type="hidden" name="id" value="3">
+
+Cuando se pulse el botón, el formulario enviará:
+
+id=3
+
+⸻
+
+El botón no elimina directamente al alumno
+
+Este botón:
+
+<button type="submit">Eliminar</button>
+
+no contiene por sí mismo la lógica necesaria para borrar un alumno.
+
+Su función es enviar el formulario.
+
+El formulario realiza una petición POST a:
+
+<form action="/eliminar-alumne" method="post">
+
+El Controller recibe la petición en:
+
+@PostMapping("/eliminar-alumne")
+
+Por tanto, el reparto de responsabilidades es:
+
+HTML
+└── Muestra el botón y envía el ID.
+Controller
+└── Recibe el ID y elimina el alumno.
+
+⸻
+
+No es obligatorio mostrar el ID
+
+El ID puede existir internamente sin mostrarse en la página.
+
+Por ejemplo, no es necesario incluir:
+
+<strong data-th-text="${alumne.id}">Id</strong>
+
+El alumno seguirá teniendo su ID dentro del objeto Java:
+
+private long id;
+
+El campo oculto seguirá accediendo a ese valor:
+
+data-th-value="${alumne.id}"
+
+Por tanto, el usuario puede ver únicamente:
+
+Laura Pérez - 42 anys - Dansa - Professora: Olga
+
+Mientras internamente el formulario conserva el identificador:
+
+id=3
+
+El ID se utiliza como una matrícula invisible que permite al programa saber exactamente qué alumno debe eliminar.
+
+⸻
+
+Flujo completo de la eliminación
+
+El proceso completo es el siguiente:
+
+El usuario pulsa el botón "Eliminar"
+                ↓
+El formulario envía una petición POST
+                ↓
+Se envía el ID oculto del alumno
+                ↓
+La petición llega a /eliminar-alumne
+                ↓
+El Controller recibe el ID con @RequestParam
+                ↓
+removeIf busca el alumno con ese ID
+                ↓
+El alumno se elimina de la lista
+                ↓
+El Controller ejecuta redirect:/
+                ↓
+Se vuelve a ejecutar mostrarInicio()
+                ↓
+El Model envía la lista actualizada
+                ↓
+Thymeleaf vuelve a generar el HTML
+
+⸻
+
+Código completo de HomeController
+
+package com.cristian.gestoralumnos.controller;
+import com.cristian.gestoralumnos.model.Alumno;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+@Controller
+public class HomeController {
+    private List<Alumno> alumnos = new ArrayList<>();
+    private long siguienteId = 1;
+    @GetMapping("/")
+    public String mostrarInicio(Model model) {
+        model.addAttribute(
+                "titolPagina",
+                "Gestor d'alumnes"
+        );
+        model.addAttribute(
+                "missatge",
+                "Benvinguda a la meva app de gestió d'alumnes"
+        );
+        model.addAttribute(
+                "totalAlumnes",
+                alumnos.size()
+        );
+        model.addAttribute(
+                "alumnes",
+                alumnos
+        );
+        return "index";
+    }
+    @PostMapping("/afegir-alumne")
+    public String afegirAlumne(
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String edad,
+            @RequestParam String modalidad,
+            @RequestParam String profesor
+    ) {
+        long nouId = siguienteId;
+        siguienteId++;
+        Alumno nouAlumne = new Alumno(
+                nouId,
+                nombre,
+                apellido,
+                edad,
+                null,
+                modalidad,
+                profesor
+        );
+        alumnos.add(nouAlumne);
+        return "redirect:/";
+    }
+    @PostMapping("/eliminar-alumne")
+    public String eliminarAlumne(
+            @RequestParam long id
+    ) {
+        alumnos.removeIf(
+                alumne -> alumne.getId() == id
+        );
+        return "redirect:/";
+    }
+}
+
+⸻
+
+Fragmento completo del listado en index.html
+
+<h2>Alumnes</h2>
+<ul>
+    <li data-th-each="alumne : ${alumnes}">
+        <strong data-th-text="${alumne.nombre}">
+            Nom
+        </strong>
+        <span data-th-text="${alumne.apellido}">
+            Cognom
+        </span>
+        -
+        <span data-th-text="${alumne.edad}">
+            Edat
+        </span>
+        anys
+        -
+        <span data-th-text="${alumne.modalidad}">
+            Modalitat
+        </span>
+        -
+        Professor/a:
+        <span data-th-text="${alumne.profesor}">
+            Professor
+        </span>
+        <form
+            action="/eliminar-alumne"
+            method="post"
+        >
+            <input
+                type="hidden"
+                name="id"
+                data-th-value="${alumne.id}"
+            >
+            <button type="submit">
+                Eliminar
+            </button>
+        </form>
+    </li>
+</ul>
+
+⸻
+
+Relación con CRUD
+
+CRUD representa las cuatro operaciones básicas que se realizan sobre los datos:
+
+Operación	Significado	Estado actual
+Create	Crear datos	Implementado
+Read	Leer y mostrar datos	Implementado
+Update	Modificar datos	Pendiente
+Delete	Eliminar datos	Implementado
+
+La ruta para añadir alumnos representa la operación Create:
+
+@PostMapping("/afegir-alumne")
+
+La ruta principal representa la operación Read:
+
+@GetMapping("/")
+
+La nueva ruta representa la operación Delete:
+
+@PostMapping("/eliminar-alumne")
+
+La siguiente operación que falta implementar es Update, que permitirá editar los datos de un alumno existente.
