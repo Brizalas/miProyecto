@@ -14,13 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class HomeController {
 
     private List<Alumno> alumnos = new ArrayList<>();
-    private long siguienteId = 4;
-
-    public HomeController() {
-        alumnos.add(new Alumno(1, "laia", "Martinez", "12", null, "Guitarra", "Cristian"));
-        alumnos.add(new Alumno(2, "Miguel", "Garcia", "21", null, "Teatre", "Blanca"));
-        alumnos.add(new Alumno(3, "Laura", "Perez", "42", null, "Dansa", "Olga"));
-    }
+    private long siguienteId = 1;
 
     @GetMapping("/")
     public String mostrarInicio(Model model) {
@@ -41,6 +35,7 @@ public class HomeController {
             @RequestParam String profesor
     ) {
 
+//        long nouId = alumnos.size() +1;--> Esto da problemas de duplicado a la larga...
         long nouId = siguienteId; //también se puede hacer 'long nouId = siguienteId ++;'
         siguienteId ++; //jugadón échale un vistazo, busca donde empieza siguienteId.
 
