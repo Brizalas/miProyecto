@@ -17,41 +17,67 @@
             Total d'alumnes registrats:
             <strong data-th-text="${totalAlumnes}">0</strong>
         </p>
-        
+
         <h2>Afegir alumne</h2>
-        
+
         <form action="/afegir-alumne" method="post">
             <label for="nombre">Nom: </label>
             <input type="text" id="nombre" name="nombre">
-            
+            <label for="apellido">Cognom:</label>
+            <input type="text" id="apellido" name="apellido">
+            <label for="edad">Edat:</label>
+            <input type="text" id="edad" name="edad">
+            <label for="modalidad">Modalitat:</label>
+            <input type="text" id="modalidad" name="modalidad">
+            <label for="profesor">Professor:</label>
+            <input type="text" id="profesor" name="profesor">
+
             <button type="submit">Afegir</button>
-             
+
         </form>
-        
+
         <hr>
-        
-        
-        
+
+
+
         <p>
             Alumnes:   
 
         </p>
+
         <ul>
             <li data-th-each="alumne: ${alumnes}">
-                <span data-th-text="${alumne.nombre}">Nom alumne</span>
-
+                <strong data-th-text="${alumne.id}">Id</strong>
+                -
+                <strong data-th-text="${alumne.nombre}">Nom</strong>
+                <span data-th-text="${alumne.apellido}">Cognom</span>
+                -
+                <span data-th-text="${alumne.edad}">Edat</span>
+                anys -
+                <span data-th-text="${alumne.modalidad}">Modalitat</span>
+                -
+                Professor/a:
+                <span data-th-text="${alumne.profesor}">Professor</span>
+                
+                <form action="/eliminar-alumne" method="post">
+                    <input
+                        type="hidden"
+                        name="id"
+                        data-th-value="${alumne.id}">
+                    <button type="submit">Eliminar</button> 
+                    
+                </form>
             </li>
         </ul>
-        
-        <p>Prova de cache 1234</p>
-        <p>Segona prova</p>
 
 
 
 
 
 
-        
+
+
+
 
     </body>
 </html>
