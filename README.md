@@ -2093,3 +2093,293 @@ La nueva ruta representa la operación Delete:
 @PostMapping("/eliminar-alumne")
 
 La siguiente operación que falta implementar es Update, que permitirá editar los datos de un alumno existente.
+
+# 11/07/2026
+
+Implementación de la función Update
+
+La función Update permite modificar los datos de un alumno que ya existe dentro de la lista.
+
+El proceso se divide en dos partes:
+
+1. Mostrar un formulario con los datos actuales del alumno.
+2. Guardar los nuevos datos en el mismo objeto.
+
+⸻
+
+Botón Editar en index.html
+
+Cada alumno tiene un botón que envía su id al Controller:
+
+<form action="/editar-alumne" method="get">
+    <input
+        type="hidden"
+        name="id"
+        data-th-value="${alumne.id}">
+    <button type="submit">Editar</button>
+</form>
+
+El formulario utiliza:
+
+method="get"
+
+porque todavía no modifica ningún dato. Solo solicita abrir la página de edición.
+
+El campo oculto envía el identificador del alumno:
+
+name="id"
+data-th-value="${alumne.id}"
+
+Por ejemplo, si pulsamos el botón del alumno con ID 3, el navegador envía una petición parecida a:
+
+/editar-alumne?id=3
+
+⸻
+
+Buscar el alumno en el Controller
+
+El Controller recibe el id, recorre la lista y localiza el objeto correspondiente:
+
+@GetMapping("/editar-alumne")
+public String mostrarFormularioEditarAlumne(
+        @RequestParam long id,
+        Model model) {
+    Alumno alumnoEncontrado = null;
+    for (Alumno alumne : alumnos) {
+        if (alumne.getId() == id) {
+            alumnoEncontrado = alumne;
+            break;
+        }
+    }
+    model.addAttribute("alumneEditar", alumnoEncontrado);
+    return "editar";
+}
+
+El botón solo envía el número del id. Por eso el Controller debe buscar qué objeto Alumno tiene ese identificador.
+
+Alumno alumnoEncontrado = null;
+
+Crea una variable donde guardar el alumno encontrado.
+
+for (Alumno alumne : alumnos)
+
+Recorre todos los alumnos de la lista.
+
+if (alumne.getId() == id)
+
+Compara el ID de cada alumno con el ID recibido desde el botón.
+
+alumnoEncontrado = alumne;
+
+Guarda el objeto completo cuando encuentra una coincidencia.
+
+break;
+
+Detiene el bucle porque los identificadores son únicos y ya no es necesario continuar buscando.
+
+Después, el objeto se envía al HTML mediante Model:
+
+model.addAttribute("alumneEditar", alumnoEncontrado);
+
+Dentro de editar.html, el alumno estará disponible con el nombre:
+
+alumneEditar
+
+Finalmente:
+
+return "editar";
+
+indica a Spring que debe mostrar:
+
+src/main/resources/templates/editar.html
+
+⸻
+
+Formulario de edición en editar.html
+
+El formulario muestra los datos actuales del alumno dentro de los inputs:
+
+<!DOCTYPE html>
+<html lang="ca">
+    <head>
+        <title>Editar alumne</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>Editar alumne</h1>
+        <form action="/actualizar-alumne" method="post">
+            <input
+                type="hidden"
+                name="id"
+                data-th-value="${alumneEditar.id}">
+            <label for="nombre">Nom:</label>
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                data-th-value="${alumneEditar.nombre}">
+            <label for="apellido">Cognom:</label>
+            <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                data-th-value="${alumneEditar.apellido}">
+            <label for="edad">Edat:</label>
+            <input
+                type="text"
+                id="edad"
+                name="edad"
+                data-th-value="${alumneEditar.edad}">
+            <label for="modalidad">Modalitat:</label>
+            <input
+                type="text"
+                id="modalidad"
+                name="modalidad"
+                data-th-value="${alumneEditar.modalidad}">
+            <label for="profesor">Professor:</label>
+            <input
+                type="text"
+                id="profesor"
+                name="profesor"
+                data-th-value="${alumneEditar.profesor}">
+            <button type="submit">Guardar canvis</button>
+        </form>
+        <a href="/">Tornar a l'inici</a>
+    </body>
+</html>
+
+Los atributos:
+
+data-th-value="${alumneEditar.nombre}"
+
+hacen que Thymeleaf coloque dentro de cada input el valor actual del alumno.
+
+Por ejemplo:
+
+data-th-value="${alumneEditar.edad}"
+
+equivale aproximadamente a ejecutar:
+
+alumnoEncontrado.getEdad();
+
+El id también se envía, pero permanece oculto:
+
+<input
+    type="hidden"
+    name="id"
+    data-th-value="${alumneEditar.id}">
+
+El usuario no necesita modificar el identificador, pero el Controller lo necesita para saber qué alumno debe actualizar.
+
+⸻
+
+Guardar los nuevos datos
+
+Cuando se pulsa el botón:
+
+<button type="submit">Guardar canvis</button>
+
+el formulario envía una petición POST hacia:
+
+/actualizar-alumne
+
+El Controller recibe los datos y modifica el objeto existente:
+
+@PostMapping("/actualizar-alumne")
+public String actualizarAlumne(
+        @RequestParam long id,
+        @RequestParam String nombre,
+        @RequestParam String apellido,
+        @RequestParam String edad,
+        @RequestParam String modalidad,
+        @RequestParam String profesor
+) {
+    for (Alumno alumne : alumnos) {
+        if (alumne.getId() == id) {
+            alumne.setNombre(nombre);
+            alumne.setApellido(apellido);
+            alumne.setEdad(edad);
+            alumne.setModalidad(modalidad);
+            alumne.setProfesor(profesor);
+            break;
+        }
+    }
+    return "redirect:/";
+}
+
+Cada dato enviado por el formulario se recoge mediante @RequestParam.
+
+La conexión se realiza mediante los nombres:
+
+HTML name="id"         → Java @RequestParam long id
+HTML name="nombre"     → Java @RequestParam String nombre
+HTML name="apellido"   → Java @RequestParam String apellido
+HTML name="edad"       → Java @RequestParam String edad
+HTML name="modalidad"  → Java @RequestParam String modalidad
+HTML name="profesor"   → Java @RequestParam String profesor
+
+El Controller vuelve a recorrer la lista:
+
+for (Alumno alumne : alumnos)
+
+Cuando encuentra el alumno cuyo ID coincide:
+
+if (alumne.getId() == id)
+
+modifica sus propiedades utilizando los setters:
+
+alumne.setNombre(nombre);
+alumne.setApellido(apellido);
+alumne.setEdad(edad);
+alumne.setModalidad(modalidad);
+alumne.setProfesor(profesor);
+
+No se elimina el alumno ni se crea uno nuevo.
+
+Se modifica directamente el mismo objeto que ya estaba guardado dentro de la lista, por lo que conserva su id.
+
+Finalmente:
+
+return "redirect:/";
+
+redirige al usuario a la página principal y muestra los datos actualizados.
+
+⸻
+
+Recorrido completo del Update
+
+El usuario pulsa Editar
+        ↓
+El formulario envía el ID
+        ↓
+GET /editar-alumne
+        ↓
+El Controller busca el alumno en la lista
+        ↓
+El Controller envía el objeto mediante Model
+        ↓
+editar.html muestra los datos actuales
+        ↓
+El usuario modifica los campos
+        ↓
+POST /actualizar-alumne
+        ↓
+El Controller busca otra vez al alumno por su ID
+        ↓
+Los setters modifican sus propiedades
+        ↓
+redirect:/
+        ↓
+La página principal muestra los datos actualizados
+
+⸻
+
+Estado actual del CRUD
+
+Create ✅
+Read   ✅
+Update ✅
+Delete ✅
+
+La aplicación ya permite crear, mostrar, editar y eliminar alumnos almacenados temporalmente en una lista.
