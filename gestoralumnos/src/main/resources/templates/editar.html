@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang = "ca">
+    <head>
+        <title>Editar alumne</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>Editar Alumne</h1>
+        
+        <form action='/actualizar-alumne' method='post'>
+            
+        <input
+            type='hidden'
+            name='id'
+            data-th-value='${alumneEditar.id}'>
+        
+        <label for='nombre'>Nom:</label>
+        <input
+            type='text'
+            id='nombre'
+            name='nombre'
+            data-th-value='${alumneEditar.nombre}'>
+        
+        <label for='apellido'>cognom</label>
+        <input
+            type='text'
+            id='apellido'
+            name='apellido'
+            data-th-value='${alumneEditar.apellido}'>
+        
+        <label for='edad'>Edat: </label>
+        <input
+            type='text'
+            id='edad'
+            name='edad'
+            data-th-value='${alumneEditar.edad}'>
+        
+        <label for='modalidad'>Modalitat:</label>
+        <input 
+            type='text'
+            id='modalidad'
+            name='modalidad'
+            data-th-value='${alumneEditar.modalidad}'>
+        
+        <label for='profesor'>Professor:</label>
+        <input 
+            type='text'
+            id='profesor'
+            name='profesor'
+            data-th-value='${alumneEditar.profesor}'>
+        
+        <button type='submit'>Guarda canvis</button>
+        
+    </form>
+        
+        <a href='/'>tornar a l'inici</a>
+    </body>
+</html>

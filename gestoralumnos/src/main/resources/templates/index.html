@@ -47,7 +47,7 @@
 
         <ul>
             <li data-th-each="alumne: ${alumnes}">
-                
+
                 <strong data-th-text="${alumne.nombre}">Nom</strong>
                 <span data-th-text="${alumne.apellido}">Cognom</span>
                 -
@@ -57,17 +57,28 @@
                 -
                 Professor/a:
                 <span data-th-text="${alumne.profesor}">Professor</span>
-                
+
                 <form action="/eliminar-alumne" method="post">
                     <input
                         type="hidden"
                         name="id"
                         data-th-value="${alumne.id}">
                     <button type="submit">Eliminar</button> 
-                    
+
+                </form>
+
+                <form action="/editar-alumne" method="get">
+                    <input type="hidden"
+                           name="id"
+                           data-th-value="${alumne.id}">
+                    <button type="submit">editar</button>
+
+
                 </form>
             </li>
         </ul>
+
+
 
 
 

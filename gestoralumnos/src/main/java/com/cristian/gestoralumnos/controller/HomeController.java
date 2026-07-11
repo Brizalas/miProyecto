@@ -28,16 +28,16 @@ public class HomeController {
 
     @PostMapping("/afegir-alumne")
     public String afegirAlumne(
-            @RequestParam String nombre, 
-            @RequestParam String apellido, 
-            @RequestParam String edad, 
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String edad,
             @RequestParam String modalidad,
             @RequestParam String profesor
     ) {
 
 //        long nouId = alumnos.size() +1;--> Esto da problemas de duplicado a la larga...
         long nouId = siguienteId; //también se puede hacer 'long nouId = siguienteId ++;'
-        siguienteId ++; //jugadón échale un vistazo, busca donde empieza siguienteId.
+        siguienteId++; //jugadón échale un vistazo, busca donde empieza siguienteId.
 
         Alumno nouAlumne = new Alumno(
                 nouId,
@@ -54,12 +54,57 @@ public class HomeController {
         return "redirect:/";
 
     }
-    
+
     @PostMapping("/eliminar-alumne")
-    public String eliminarAlumne(@RequestParam long id){
-        alumnos.removeIf(alumne -> alumne.getId()== id);
-        
+    public String eliminarAlumne(@RequestParam long id) {
+        alumnos.removeIf(alumne -> alumne.getId() == id);
+
         return "redirect:/";
+    }
+
+    @GetMapping("/editar-alumne")
+    public String MostrarFormularioEditarAlumne(@RequestParam long id,
+            Model model) {
+
+        Alumno alumnoEncontrado = null;
+
+        for (Alumno a : alumnos) {
+            if (a.getId() == id) {
+                alumnoEncontrado = a;
+                break;
+            }
+        }
+
+        model.addAttribute("alumneEditar", alumnoEncontrado);
+
+        return "editar";
+    }
+
+    @PostMapping("/actualizar-alumne")
+    public String actualizarAlumne(
+            @RequestParam long id,
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String edad,
+            @RequestParam String modalidad,
+            @RequestParam String profesor
+    ) {
+
+        for (Alumno a : alumnos) {
+
+            if (a.getId() == id) {
+                a.setNombre(nombre);
+                a.setApellido(apellido);
+                a.setEdad(edad);
+                a.setModalidad(modalidad);
+                a.setProfesor(profesor);
+
+                break;
+            }
+        }
+
+        return "redirect:/";
+
     }
 
 }
