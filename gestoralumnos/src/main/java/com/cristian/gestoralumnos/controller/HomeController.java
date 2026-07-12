@@ -1,5 +1,6 @@
 package com.cristian.gestoralumnos.controller;
 
+import com.cristian.gestoralumnos.repository.AlumnoRepository;
 import com.cristian.gestoralumnos.model.Alumno;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +14,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 public class HomeController {
 
-    private List<Alumno> alumnos = new ArrayList<>();
-    private long siguienteId = 1;
+    
+ 
+    
+    private final AlumnoRepository alumnoRepository;
+    public HomeController(AlumnoRepository alumnoRepository){
+        this.alumnoRepository=alumnoRepository;
+    }
 
     @GetMapping("/")
     public String mostrarInicio(Model model) {
+        List<Alumno>alumnosGuardados = alumnoRepository.findAll();
         model.addAttribute("titolPagina", "Gestor d'alumnes");
         model.addAttribute("missatge", "Benvinguda a la meva app de gestió d'alumnes");
-        model.addAttribute("totalAlumnes", alumnos.size());
-        model.addAttribute("alumnes", alumnos);
+        model.addAttribute("totalAlumnes", alumnosGuardados.size());
+        model.addAttribute("alumnes", alumnosGuardados);
 
         return "index";
     }
@@ -35,12 +42,9 @@ public class HomeController {
             @RequestParam String profesor
     ) {
 
-//        long nouId = alumnos.size() +1;--> Esto da problemas de duplicado a la larga...
-        long nouId = siguienteId; //también se puede hacer 'long nouId = siguienteId ++;'
-        siguienteId++; //jugadón échale un vistazo, busca donde empieza siguienteId.
 
         Alumno nouAlumne = new Alumno(
-                nouId,
+                null,
                 nombre,
                 apellido,
                 edad,
@@ -49,31 +53,24 @@ public class HomeController {
                 profesor
         );
 
-        alumnos.add(nouAlumne);
+        alumnoRepository.save(nouAlumne);
 
         return "redirect:/";
 
     }
 
     @PostMapping("/eliminar-alumne")
-    public String eliminarAlumne(@RequestParam long id) {
-        alumnos.removeIf(alumne -> alumne.getId() == id);
+    public String eliminarAlumne(@RequestParam Long id) {
+        alumnoRepository.deleteById(id);
 
         return "redirect:/";
     }
 
     @GetMapping("/editar-alumne")
-    public String MostrarFormularioEditarAlumne(@RequestParam long id,
+    public String MostrarFormularioEditarAlumne(@RequestParam Long id,
             Model model) {
 
-        Alumno alumnoEncontrado = null;
-
-        for (Alumno a : alumnos) {
-            if (a.getId() == id) {
-                alumnoEncontrado = a;
-                break;
-            }
-        }
+        Alumno alumnoEncontrado = alumnoRepository.findById(id).orElse(null);
 
         model.addAttribute("alumneEditar", alumnoEncontrado);
 
@@ -90,17 +87,16 @@ public class HomeController {
             @RequestParam String profesor
     ) {
 
-        for (Alumno a : alumnos) {
-
-            if (a.getId() == id) {
-                a.setNombre(nombre);
-                a.setApellido(apellido);
-                a.setEdad(edad);
-                a.setModalidad(modalidad);
-                a.setProfesor(profesor);
-
-                break;
-            }
+       Alumno alumnoEncontrado = alumnoRepository.findById(id).orElse(null);
+       
+       if(alumnoEncontrado != null) {
+           alumnoEncontrado.setNombre(nombre);
+           alumnoEncontrado.setApellido(apellido);
+           alumnoEncontrado.setEdad(edad);
+           alumnoEncontrado.setModalidad(modalidad);
+           alumnoEncontrado.setProfesor(profesor);
+           
+           alumnoRepository.save(alumnoEncontrado);
         }
 
         return "redirect:/";

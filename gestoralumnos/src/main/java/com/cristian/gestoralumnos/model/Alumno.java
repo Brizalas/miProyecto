@@ -1,10 +1,16 @@
 package com.cristian.gestoralumnos.model;
 
 import java.util.Date;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
+@Entity
 public class Alumno {
-
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String nombre;
     private String apellido;
     private String edad;
@@ -16,7 +22,7 @@ public class Alumno {
 
     }
 
-    public Alumno(long id, String nombre, String apellido, String edad, Date fechaNac, String modalidad, String profesor) {
+    public Alumno(Long id, String nombre, String apellido, String edad, Date fechaNac, String modalidad, String profesor) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -27,11 +33,11 @@ public class Alumno {
 
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
