@@ -22,20 +22,42 @@
 
         <form action="/afegir-alumne" method="post" data-th-object="${nuevoAlumno}">
             <label for="nombre">Nom: </label>
-            <input type="text" id="nombre" name="nombre">
+            <input type="text" id="nombre" data-th-field="*{nombre}">
             <p
                 data-th-if="${#fields.hasErrors('nombre')}"
                 data-th-errors="*{nombre}">
                 Error en el nom 
             </p>
             <label for="apellido">Cognom:</label>
-            <input type="text" id="apellido" name="apellido">
+            <input type="text" id="apellido" data-th-field="*{apellido}">
+            
+            <p 
+                data-th-if="${#fields.hasErrors('apellido')}"
+                data-th-errors="*{apellido}">Error en el cognom
+            </p>
+            
             <label for="fechaNacimiento">Data de naixament:</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+            <input type="date" id="fechaNacimiento" data-th-field="*{fechaNacimiento}">
+            
+            <p 
+                data-th-if="${#fields.hasErrors('fechaNacimiento')}"
+                data-th-errors="*{fechaNacimiento}">Error en la data
+            </p>
+            
+            
             <label for="modalidad">Modalitat:</label>
-            <input type="text" id="modalidad" name="modalidad">
+            <input type="text" id="modalidad" data-th-field="*{modalidad}">
+            
+             <p 
+                data-th-if="${#fields.hasErrors('modalidad')}"
+                data-th-errors="*{modalidad}">Error en la modalitat
+            </p>
             <label for="profesor">Professor:</label>
-            <input type="text" id="profesor" name="profesor">
+            <input type="text" id="profesor" data-th-field="*{profesor}">
+             <p 
+                data-th-if="${#fields.hasErrors('profesor')}"
+                data-th-errors="*{profesor}">Error en el professor
+            </p>
 
             <button type="submit">Afegir</button>
 

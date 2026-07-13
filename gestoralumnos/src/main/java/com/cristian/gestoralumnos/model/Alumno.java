@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
 
 @Entity
@@ -15,13 +17,14 @@ public class Alumno {
     private Long id;
     @NotBlank(message = "El nom es obligatori")
     private String nombre;
-
+    @NotBlank(message = "El cognom es obligatori")
     private String apellido;
-
+    @NotNull(message = "Data de naixament obligatoria")
+    @Past(message = "La data de naixament ha de ser anterior a avui")
     private LocalDate fechaNacimiento;
-
+    @NotBlank(message = "La disciplina es obligatoria")
     private String modalidad;
-
+    @NotBlank(message = "El professor es obligatori")
     private String profesor;
 
     public Alumno() {

@@ -81,27 +81,34 @@ public class HomeController {
 
     @PostMapping("/actualizar-alumne")
     public String actualizarAlumne(
-            @RequestParam Long id,
-            @RequestParam String nombre,
-            @RequestParam String apellido,
-            @RequestParam String modalidad,
-            @RequestParam String profesor
+            @Valid
+            @ModelAttribute("alumneEditar") Alumno alumneEditar,
+            BindingResult resultado
     ) {
 
-        Alumno alumnoEncontrado = alumnoRepository.findById(id).orElse(null);
-
-        if (alumnoEncontrado != null) {
-            alumnoEncontrado.setNombre(nombre);
-            alumnoEncontrado.setApellido(apellido);
-
-            alumnoEncontrado.setModalidad(modalidad);
-            alumnoEncontrado.setProfesor(profesor);
-
-            alumnoRepository.save(alumnoEncontrado);
+        if (resultado.hasErrors()) {
+            return "editar";
         }
 
-        return "redirect:/";
+        Alumno alumnoEncontrado = alumnoRepository
+                .findById(alumneEditar.getId())
+                .orElse(null);
 
+        if (alumnoEncontrado == null) {
+            return "redirect:/";
+        }
+
+        alumnoEncontrado.setNombre(alumneEditar.getNombre());
+        alumnoEncontrado.setApellido(alumneEditar.getApellido());
+        alumnoEncontrado.setFechaNacimiento(
+                alumneEditar.getFechaNacimiento()
+        );
+        alumnoEncontrado.setModalidad(alumneEditar.getModalidad());
+        alumnoEncontrado.setProfesor(alumneEditar.getProfesor());
+
+        alumnoRepository.save(alumnoEncontrado);
+
+        return "redirect:/";
     }
 
 }

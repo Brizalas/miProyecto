@@ -1,60 +1,87 @@
 <!DOCTYPE html>
 
-<html lang = "ca">
+<html lang="ca">
     <head>
         <title>Editar alumne</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
+
     <body>
-        <h1>Editar Alumne</h1>
-        
-        <form action='/actualizar-alumne' method='post'>
-            
-        <input
-            type='hidden'
-            name='id'
-            data-th-value='${alumneEditar.id}'>
-        
-        <label for='nombre'>Nom:</label>
-        <input
-            type='text'
-            id='nombre'
-            name='nombre'
-            data-th-value='${alumneEditar.nombre}'>
-        
-        <label for='apellido'>cognom</label>
-        <input
-            type='text'
-            id='apellido'
-            name='apellido'
-            data-th-value='${alumneEditar.apellido}'>
-        
-        <label for='fechaNacimiento'>Data de naixament: </label>
-        <input
-            type='date'
-            id='fechaNacimiento'
-            name='fefchaNacimiento'
-            data-th-value='${alumneEditar.fechaNacimiento}'>
-        
-        <label for='modalidad'>Modalitat:</label>
-        <input 
-            type='text'
-            id='modalidad'
-            name='modalidad'
-            data-th-value='${alumneEditar.modalidad}'>
-        
-        <label for='profesor'>Professor:</label>
-        <input 
-            type='text'
-            id='profesor'
-            name='profesor'
-            data-th-value='${alumneEditar.profesor}'>
-        
-        <button type='submit'>Guarda canvis</button>
-        
-    </form>
-        
-        <a href='/'>tornar a l'inici</a>
+        <h1>Editar alumne</h1>
+
+        <form
+            action="/actualizar-alumne"
+            method="post"
+            data-th-object="${alumneEditar}">
+
+            <input
+                type="hidden"
+                data-th-field="*{id}">
+
+            <label for="nombre">Nom:</label>
+            <input
+                type="text"
+                id="nombre"
+                data-th-field="*{nombre}">
+
+            <p
+                data-th-if="${#fields.hasErrors('nombre')}"
+                data-th-errors="*{nombre}">
+                Error en el nom
+            </p>
+
+            <label for="apellido">Cognom:</label>
+            <input
+                type="text"
+                id="apellido"
+                data-th-field="*{apellido}">
+
+            <p
+                data-th-if="${#fields.hasErrors('apellido')}"
+                data-th-errors="*{apellido}">
+                Error en el cognom
+            </p>
+
+            <label for="fechaNacimiento">Data de naixement:</label>
+            <input
+                type="date"
+                id="fechaNacimiento"
+                data-th-field="*{fechaNacimiento}">
+
+            <p
+                data-th-if="${#fields.hasErrors('fechaNacimiento')}"
+                data-th-errors="*{fechaNacimiento}">
+                Error en la data
+            </p>
+
+            <label for="modalidad">Modalitat:</label>
+            <input
+                type="text"
+                id="modalidad"
+                data-th-field="*{modalidad}">
+
+            <p
+                data-th-if="${#fields.hasErrors('modalidad')}"
+                data-th-errors="*{modalidad}">
+                Error en la modalitat
+            </p>
+
+            <label for="profesor">Professor:</label>
+            <input
+                type="text"
+                id="profesor"
+                data-th-field="*{profesor}">
+
+            <p
+                data-th-if="${#fields.hasErrors('profesor')}"
+                data-th-errors="*{profesor}">
+                Error en el professor
+            </p>
+
+            <button type="submit">Guardar canvis</button>
+        </form>
+
+        <a href="/">Tornar a l'inici</a>
     </body>
 </html>
