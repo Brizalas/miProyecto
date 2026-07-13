@@ -2,7 +2,8 @@ package com.cristian.gestoralumnos.controller;
 
 import com.cristian.gestoralumnos.repository.AlumnoRepository;
 import com.cristian.gestoralumnos.model.Alumno;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,7 +38,9 @@ public class HomeController {
     public String afegirAlumne(
             @RequestParam String nombre,
             @RequestParam String apellido,
-            @RequestParam String edad,
+            @RequestParam 
+                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate fechaNacimiento,
             @RequestParam String modalidad,
             @RequestParam String profesor
     ) {
@@ -47,8 +50,8 @@ public class HomeController {
                 null,
                 nombre,
                 apellido,
-                edad,
-                null,
+                
+                fechaNacimiento,
                 modalidad,
                 profesor
         );
@@ -79,10 +82,10 @@ public class HomeController {
 
     @PostMapping("/actualizar-alumne")
     public String actualizarAlumne(
-            @RequestParam long id,
+            @RequestParam Long id,
             @RequestParam String nombre,
             @RequestParam String apellido,
-            @RequestParam String edad,
+            
             @RequestParam String modalidad,
             @RequestParam String profesor
     ) {
@@ -92,7 +95,7 @@ public class HomeController {
        if(alumnoEncontrado != null) {
            alumnoEncontrado.setNombre(nombre);
            alumnoEncontrado.setApellido(apellido);
-           alumnoEncontrado.setEdad(edad);
+           
            alumnoEncontrado.setModalidad(modalidad);
            alumnoEncontrado.setProfesor(profesor);
            

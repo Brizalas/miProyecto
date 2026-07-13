@@ -1,10 +1,11 @@
 package com.cristian.gestoralumnos.model;
 
-import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDate;
 
 @Entity
 public class Alumno {
@@ -13,8 +14,8 @@ public class Alumno {
     private Long id;
     private String nombre;
     private String apellido;
-    private String edad;
-    private Date fechaNac;
+   
+    private LocalDate fechaNacimiento;
     private String modalidad;
     private String profesor;
 
@@ -22,12 +23,12 @@ public class Alumno {
 
     }
 
-    public Alumno(Long id, String nombre, String apellido, String edad, Date fechaNac, String modalidad, String profesor) {
+    public Alumno(Long id, String nombre, String apellido, LocalDate fechaNacimiento, String modalidad, String profesor) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.edad = edad;
-        this.fechaNac = fechaNac;
+       
+        this.fechaNacimiento = fechaNacimiento;
         this.modalidad = modalidad;
         this.profesor = profesor;
 
@@ -57,20 +58,14 @@ public class Alumno {
         this.apellido=apellido;
     }
 
-    public String getEdad() {
-        return edad;
+    
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
     }
 
-    public void setEdad(String edad) {
-        this.edad = edad;
-    }
-
-    public Date getFechaNac() {
-        return fechaNac;
-    }
-
-    public void setFechaNac(Date fechaNac) {
-        this.fechaNac = fechaNac;
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     public String getModalidad() {
@@ -91,8 +86,7 @@ public class Alumno {
 
     @Override
     public String toString() {
-        return "Alumno{" + "id= " + id + ", nombre= " + nombre + ", apellido= " + apellido + ", edad= " 
-                + edad + ", fechaNac= "  + fechaNac + ", modalidad= " + modalidad + ", profesor= " + profesor + '}';
+        return "Alumno{" + "id= " + id + ", nombre= " + nombre + ", apellido= " + apellido + ", fechaNacimiento= "  + fechaNacimiento + ", modalidad= " + modalidad + ", profesor= " + profesor + '}';
     }
 
     

@@ -25,8 +25,8 @@
             <input type="text" id="nombre" name="nombre">
             <label for="apellido">Cognom:</label>
             <input type="text" id="apellido" name="apellido">
-            <label for="edad">Edat:</label>
-            <input type="text" id="edad" name="edad">
+            <label for="fechaNacimiento">Data de naixament:</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento">
             <label for="modalidad">Modalitat:</label>
             <input type="text" id="modalidad" name="modalidad">
             <label for="profesor">Professor:</label>
@@ -51,8 +51,8 @@
                 <strong data-th-text="${alumne.nombre}">Nom</strong>
                 <span data-th-text="${alumne.apellido}">Cognom</span>
                 -
-                <span data-th-text="${alumne.edad}">Edat</span>
-                anys -
+                <span data-th-text="${alumne.fechaNacimiento}">Data de naixament</span>
+                -
                 <span data-th-text="${alumne.modalidad}">Modalitat</span>
                 -
                 Professor/a:
