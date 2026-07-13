@@ -1,22 +1,27 @@
 package com.cristian.gestoralumnos.model;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Entity
 public class Alumno {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank(message = "El nom es obligatori")
     private String nombre;
+
     private String apellido;
-   
+
     private LocalDate fechaNacimiento;
+
     private String modalidad;
+
     private String profesor;
 
     public Alumno() {
@@ -27,7 +32,7 @@ public class Alumno {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
-       
+
         this.fechaNacimiento = fechaNacimiento;
         this.modalidad = modalidad;
         this.profesor = profesor;
@@ -49,16 +54,14 @@ public class Alumno {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-    
+
     public String getApellido() {
         return apellido;
     }
-    
-    public void setApellido(String apellido){
-        this.apellido=apellido;
-    }
 
-    
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
 
     public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
@@ -86,9 +89,7 @@ public class Alumno {
 
     @Override
     public String toString() {
-        return "Alumno{" + "id= " + id + ", nombre= " + nombre + ", apellido= " + apellido + ", fechaNacimiento= "  + fechaNacimiento + ", modalidad= " + modalidad + ", profesor= " + profesor + '}';
+        return "Alumno{" + "id= " + id + ", nombre= " + nombre + ", apellido= " + apellido + ", fechaNacimiento= " + fechaNacimiento + ", modalidad= " + modalidad + ", profesor= " + profesor + '}';
     }
-
-    
 
 }

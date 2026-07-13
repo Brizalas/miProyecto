@@ -20,9 +20,14 @@
 
         <h2>Afegir alumne</h2>
 
-        <form action="/afegir-alumne" method="post">
+        <form action="/afegir-alumne" method="post" data-th-object="${nuevoAlumno}">
             <label for="nombre">Nom: </label>
             <input type="text" id="nombre" name="nombre">
+            <p
+                data-th-if="${#fields.hasErrors('nombre')}"
+                data-th-errors="*{nombre}">
+                Error en el nom 
+            </p>
             <label for="apellido">Cognom:</label>
             <input type="text" id="apellido" name="apellido">
             <label for="fechaNacimiento">Data de naixament:</label>
