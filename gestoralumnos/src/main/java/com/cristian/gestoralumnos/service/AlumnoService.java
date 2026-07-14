@@ -17,4 +17,16 @@ public class AlumnoService {
     public List<Alumno> listarAlumnos() {
         return alumnoRepository.findAll();
     }
+    
+    public Alumno guardarAlumno(Alumno alumno){
+        return alumnoRepository.save(alumno);
+    }
+    
+    public void eliminarAlumno(Long id){
+         alumnoRepository.deleteById(id);
+    }
+    
+    public Alumno encontrarAlumno(Long id){
+        return alumnoRepository.findById(id).orElse(null);
+    }
 }

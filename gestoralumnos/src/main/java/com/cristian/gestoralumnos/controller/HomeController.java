@@ -48,7 +48,7 @@ public class HomeController {
 
         if (resultado.hasErrors()) {
 
-            List<Alumno> alumnosGuardados = alumnoRepository.findAll();
+            List<Alumno> alumnosGuardados = alumnoService.listarAlumnos();
 
             model.addAttribute("titolPagina", "Gestor d'alumnes");
             model.addAttribute("missatge", "Benvinguda a la meva app de gestió d'alumnes");
@@ -58,7 +58,7 @@ public class HomeController {
             return "index";
         }
 
-        alumnoRepository.save(nuevoAlumno);
+        alumnoService.guardarAlumno(nuevoAlumno);
 
         return "redirect:/";
 
@@ -66,7 +66,7 @@ public class HomeController {
 
     @PostMapping("/eliminar-alumne")
     public String eliminarAlumne(@RequestParam Long id) {
-        alumnoRepository.deleteById(id);
+        alumnoService.eliminarAlumno(id);
 
         return "redirect:/";
     }
@@ -75,7 +75,7 @@ public class HomeController {
     public String mostrarFormularioEditarAlumne(@RequestParam Long id,
             Model model) {
 
-        Alumno alumnoEncontrado = alumnoRepository.findById(id).orElse(null);
+        Alumno alumnoEncontrado = alumnoService.encontrarAlumno(id);
         if(alumnoEncontrado==null){
             return "redirect:/";
         }
@@ -95,9 +95,7 @@ public class HomeController {
             return "editar";
         }
 
-        Alumno alumnoEncontrado = alumnoRepository
-                .findById(alumneEditar.getId())
-                .orElse(null);
+         Alumno alumnoEncontrado = alumnoService.encontrarAlumno(alumneEditar.getId());
 
         if (alumnoEncontrado == null) {
             return "redirect:/";
