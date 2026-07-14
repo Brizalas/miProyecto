@@ -2,6 +2,7 @@ package com.cristian.gestoralumnos.controller;
 
 import com.cristian.gestoralumnos.repository.AlumnoRepository;
 import com.cristian.gestoralumnos.model.Alumno;
+import com.cristian.gestoralumnos.service.AlumnoService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -16,15 +17,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 public class HomeController {
 
+    private final AlumnoService alumnoService;
     private final AlumnoRepository alumnoRepository;
 
-    public HomeController(AlumnoRepository alumnoRepository) {
-        this.alumnoRepository = alumnoRepository;
+    public HomeController(AlumnoService alumnoService, AlumnoRepository alumnoRepository) {
+        this.alumnoService = alumnoService;
+        this.alumnoRepository=alumnoRepository;
     }
 
     @GetMapping("/")
     public String mostrarInicio(Model model) {
-        List<Alumno> alumnosGuardados = alumnoRepository.findAll();
+        List<Alumno> alumnosGuardados = alumnoService.listarAlumnos();
         model.addAttribute("titolPagina", "Gestor d'alumnes");
         model.addAttribute("missatge", "Benvinguda a la meva app de gestió d'alumnes");
         model.addAttribute("totalAlumnes", alumnosGuardados.size());
@@ -69,11 +72,13 @@ public class HomeController {
     }
 
     @GetMapping("/editar-alumne")
-    public String MostrarFormularioEditarAlumne(@RequestParam Long id,
+    public String mostrarFormularioEditarAlumne(@RequestParam Long id,
             Model model) {
 
         Alumno alumnoEncontrado = alumnoRepository.findById(id).orElse(null);
-
+        if(alumnoEncontrado==null){
+            return "redirect:/";
+        }
         model.addAttribute("alumneEditar", alumnoEncontrado);
 
         return "editar";
